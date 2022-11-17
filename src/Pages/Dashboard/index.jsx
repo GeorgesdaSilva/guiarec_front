@@ -1,33 +1,77 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { UserCircle, SignOut, ClipboardText, PlayCircle } from "phosphor-react";
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-
-import { vitrineitens } from "../../components/VideoPreviewSlider";
 import PostList from "../../components/PostList";
 import { PostAdd } from "../../components/PostAdd";
 import SubmitList from "../../components/SubmitList";
+import { Navigate } from "react-router-dom";
+import api from "../../services/api";
 
 const index = () => {
   const [title, setTitle] = useState("Formulário");
   const [selected, setSelected] = useState(0);
+  const [isAuth, setIsAuth] = useState(true);
+  const [dialog, setDialog] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState([]);
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setIsAuth(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
+  const getPosts = async () => {
+    try {
+      var { data } = await api().get("/posts");
+      setPosts(data);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const getUser=()=>{
+    var user=JSON.parse(localStorage.getItem("user"))
+    setUser(user)
+  }
+  useEffect(() => {
+    getPosts()
+    getUser()
+  }, [])
+  const closeDialog = () => {
+    setDialog(false)
+  }
+
+  const openDialog = () => {
+    setDialog(true)
+  }
+
+  const navigateToHome = () => {
+    window.location.href="/"
+  }
   return (
     <div className="bg-[#F0F4F8] w-full">
+      {!isAuth && (
+        <Navigate to="/" replace={true} />
+      )}
       <div className=" md:m-auto">
         <div className="mx-5 py-4 flex justify-between">
-          <img src="./Logoguia.svg" className="h-8 " />
+          <img src="./Logoguia.svg" className="h-8 " onClick={() => navigateToHome()} />
           <div className=" flex gap-4 items-center">
             <div className="flex gap-1 justify-center items-center">
               <div className="flex flex-col justify-center">
-                <span>Luan Rodrigues</span>
+                <span>{user.name}</span>
                 <span className="text-xs">Administrador</span>
               </div>
               <UserCircle size={45} color="rgb(113 113 122)" />
             </div>
-            <a href="./">
+            <button onClick={handleLogout}>
               <SignOut size={24} color="rgb(113 113 122)" />
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -87,7 +131,7 @@ const index = () => {
                   </div>
                   <div>
                     <h3 className=" ml-2 text-3xl font-black text-zinc-500">
-                      {vitrineitens.length}
+                      {posts.length}
                     </h3>
                   </div>
                 </div>
@@ -101,9 +145,9 @@ const index = () => {
                 <SubmitList />
               ) : (
                 <div>
-                  <Dialog.Root>
-                    <PostAdd />
-                    <PostList />
+                  <Dialog.Root open={dialog}>
+                    <PostAdd close={closeDialog} />
+                    <PostList open={openDialog} status={dialog} />
                   </Dialog.Root>
                 </div>
               )}
