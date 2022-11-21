@@ -8,7 +8,9 @@ const PostList = (Children) => {
 
   const getPosts = async () => {
     try {
+     
       var {data}=await api().get("/posts");
+      console.log(data)
       setPosts(data);
     } catch (e) {
       console.log(e);

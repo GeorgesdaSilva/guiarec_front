@@ -99,6 +99,17 @@ export const PostAdd = (Children) => {
               className={inputstyle}
             ></textarea>
           </div>
+          <div className="flex flex-col">
+            <label htmlFor="name" className="font-semibold">
+              Categoria
+            </label>
+            <select onChange={(v)=>setCategory(v.target.value)}>
+              <option value="Anuncio">Anuncio</option>
+              <option  value="Teste">Teste</option>
+              <option  value="Commons">Commons</option>
+            </select>
+            
+          </div>
           <Dialog.Close />
 
           <button onClick={() => addPost()}

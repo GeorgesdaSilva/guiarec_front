@@ -20,7 +20,6 @@ export const VideoPreviewSlider = () => {
     try {
     
      var {data}= await api().get("/posts/public",);
-     console.log(data)
     setPosts(data);
     
     } catch (e) {
